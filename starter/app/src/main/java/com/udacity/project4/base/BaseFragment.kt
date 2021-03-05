@@ -30,6 +30,10 @@ abstract class BaseFragment : Fragment() {
         viewModel.showSnackBarInt.observe(this, Observer {
             Snackbar.make(this.requireView(), getString(it), Snackbar.LENGTH_LONG).show()
         })
+        viewModel.showSnackBarIntAction.observe(this, Observer {
+            Snackbar.make(this.requireView(), getString(it.first), Snackbar.LENGTH_LONG)
+                .setAction(it.second.first, it.second.second).show()
+        })
         viewModel.showMessage.observe(this, Observer { message ->
             AlertDialog.Builder(message.context).apply {
                 setTitle(message.title)

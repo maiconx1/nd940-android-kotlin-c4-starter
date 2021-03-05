@@ -136,9 +136,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 MarkerOptions().position(latLng).title(getString(R.string.dropped_pin))
                     .snippet(snippet)
             ).apply { showInfoWindow() }
-            viewModel.latitude.value = latLng.latitude
-            viewModel.longitude.value = latLng.longitude
             viewModel.selectedPOI.value = null
+            viewModel.latLng.value = latLng
         }
     }
 
@@ -148,6 +147,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             map.addMarker(MarkerOptions().position(poi.latLng).title(poi.name))
                 .apply { showInfoWindow() }
             viewModel.selectedPOI.value = poi
+            viewModel.latLng.value = poi.latLng
         }
     }
 
@@ -161,8 +161,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                     if (viewModel.selectedPOI.value != null) viewModel.selectedPOI.value?.name
                         ?: "" else getString(
                         R.string.lat_long_snippet,
-                        viewModel.latitude.value,
-                        viewModel.longitude.value
+                        viewModel.latLng.value?.latitude,
+                        viewModel.latLng.value?.longitude
                     )
                 ),
                 Pair(getString(R.string.choose_button), DialogInterface.OnClickListener { _, _ ->
@@ -203,8 +203,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     private fun onBackPressed() {
         viewModel.selectedPOI.value = null
-        viewModel.latitude.value = null
-        viewModel.longitude.value = null
+        viewModel.latLng.value = null
         viewModel.showToast.value = getString(R.string.select_cancelled)
         viewModel.navigationCommand.value = NavigationCommand.Back
     }
