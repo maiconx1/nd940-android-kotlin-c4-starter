@@ -1,11 +1,9 @@
 package com.udacity.project4
 
+import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.udacity.project4.locationreminders.data.ReminderDataSource
-import com.udacity.project4.locationreminders.data.local.FakeDao
-import com.udacity.project4.locationreminders.data.local.LocalDB
-import com.udacity.project4.locationreminders.data.local.RemindersDao
-import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
+import com.udacity.project4.locationreminders.data.local.*
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import org.junit.After
@@ -41,7 +39,12 @@ interface BaseTest : KoinTest {
                 )
             }
             single { RemindersLocalRepository(get(named("fakeDao"))) as ReminderDataSource }
-            single(named("dao")) { LocalDB.createRemindersDao(androidContext()) }
+            single(named("dao")) {
+                Room.inMemoryDatabaseBuilder(
+                    androidContext(),
+                    RemindersDatabase::class.java
+                ).build().reminderDao()
+            }
             single<RemindersDao>(named("fakeDao")) { FakeDao() }
         }
 
