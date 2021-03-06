@@ -49,4 +49,5 @@
     <string name="choose_button">Choose</string>
     <string name="cancel_button">Cancel</string>
     <string name="desc_floating_button_save">Floating button save</string>
+    <string name="content_add_button">Add button</string>
 </resources>

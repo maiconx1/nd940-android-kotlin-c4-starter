@@ -19,12 +19,12 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="32dp">
+            android:layout_margin="@dimen/padding_large">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/margin_normal"
                 android:orientation="vertical">
 
                 <TextView
@@ -33,7 +33,7 @@
                     android:layout_height="wrap_content"
                     android:text="@{reminderDataItem.title}"
                     android:textColor="@color/black"
-                    android:textSize="21sp"
+                    android:textSize="@dimen/text_size_large"
                     tools:text="Reminder title" />
 
                 <TextView
@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@{reminderDataItem.description}"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/text_size_medium"
                     tools:text="Reminder description" />
 
                 <TextView

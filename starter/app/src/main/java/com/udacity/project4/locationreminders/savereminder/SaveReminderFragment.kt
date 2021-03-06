@@ -27,6 +27,7 @@ import com.udacity.project4.databinding.FragmentSaveReminderBinding
 import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
+import com.udacity.project4.utils.setTitle
 import org.koin.android.ext.android.inject
 
 class SaveReminderFragment : BaseFragment() {
@@ -183,6 +184,11 @@ class SaveReminderFragment : BaseFragment() {
         } else {
             requestForegroundAndBackgroundLocationPermissions()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setTitle(getString(R.string.app_name))
     }
 
     private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true) {

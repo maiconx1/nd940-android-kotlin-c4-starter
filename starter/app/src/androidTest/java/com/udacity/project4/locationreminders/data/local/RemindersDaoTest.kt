@@ -6,16 +6,13 @@ import androidx.test.filters.SmallTest
 import com.udacity.project4.BaseTest
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.util.ReminderUtils
-
-import org.junit.Rule
-import org.junit.runner.RunWith
-
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.After
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.koin.core.qualifier.named
 import org.koin.test.inject
 
@@ -29,13 +26,6 @@ class RemindersDaoTest : BaseTest {
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
-
-    @After
-    fun resetDatabase() {
-        runBlockingTest {
-            remindersDao.deleteAllReminders()
-        }
-    }
 
     @Test
     fun saveReminderAndGetById() = runBlockingTest {

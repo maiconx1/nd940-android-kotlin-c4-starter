@@ -10,7 +10,6 @@ import com.udacity.project4.locationreminders.data.dto.Result
 import com.udacity.project4.util.ReminderUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule

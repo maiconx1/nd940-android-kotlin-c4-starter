@@ -42,7 +42,7 @@ class FakeDataSource : ReminderDataSource {
         reminderList.clear()
     }
 
-    override suspend fun deleteReminders(vararg id: String) {
+    override suspend fun deleteReminders(id: String) {
         reminderList.removeIf { reminder ->
             id.contains(reminder.id)
         }
