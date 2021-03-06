@@ -39,4 +39,16 @@ interface RemindersDao {
     @Query("DELETE FROM reminders")
     suspend fun deleteAllReminders()
 
+    /**
+     * Delete reminders by id.
+     */
+    @Query("DELETE FROM reminders WHERE entry_id IN (:id)")
+    suspend fun deleteReminders(id: List<String>)
+
+    /**
+     * Delete reminders by id.
+     */
+    @Query("SELECT requestCode FROM reminders ORDER BY requestCode DESC LIMIT 1")
+    suspend fun getLastRequestCode(): Int
+
 }

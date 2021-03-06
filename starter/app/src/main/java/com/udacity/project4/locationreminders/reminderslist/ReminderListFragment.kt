@@ -10,6 +10,7 @@ import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentRemindersBinding
+import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import com.udacity.project4.utils.setTitle
 import com.udacity.project4.utils.setup
@@ -65,6 +66,7 @@ class ReminderListFragment : BaseFragment() {
 
     private fun setupRecyclerView() {
         val adapter = RemindersListAdapter {
+            startActivity(ReminderDescriptionActivity.newIntent(requireContext(), it))
         }
 
 //        setup the recycler view using the extension function
@@ -76,7 +78,11 @@ class ReminderListFragment : BaseFragment() {
             R.id.logout -> {
                 FirebaseAuth.getInstance().signOut()
                 val flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(Intent(activity, AuthenticationActivity::class.java).apply { this.flags = flags })
+                startActivity(
+                    Intent(
+                        activity,
+                        AuthenticationActivity::class.java
+                    ).apply { this.flags = flags })
             }
         }
         return super.onOptionsItemSelected(item)

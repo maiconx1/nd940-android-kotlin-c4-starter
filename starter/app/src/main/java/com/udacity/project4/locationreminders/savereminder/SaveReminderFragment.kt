@@ -18,6 +18,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import com.google.android.gms.location.Geofence.NEVER_EXPIRE
 import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
@@ -27,7 +28,6 @@ import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class SaveReminderFragment : BaseFragment() {
 
@@ -40,12 +40,6 @@ class SaveReminderFragment : BaseFragment() {
 
     private val runningQOrLater = android.os.Build.VERSION.SDK_INT >=
             android.os.Build.VERSION_CODES.Q
-
-    private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
-        intent.action = ACTION_GEOFENCE_EVENT
-        PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_TURN_DEVICE_LOCATION_ON) {
@@ -63,6 +57,8 @@ class SaveReminderFragment : BaseFragment() {
         setDisplayHomeAsUpEnabled(true)
 
         binding.viewModel = viewModel
+
+        viewModel.fetchRequestCode()
 
         viewModel.selectedPOI.observe(viewLifecycleOwner, Observer { poi ->
             viewModel.reminderSelectedLocationStr.value = poi?.let {
@@ -99,7 +95,14 @@ class SaveReminderFragment : BaseFragment() {
             val latLng = viewModel.latLng.value
 
             dataItem =
-                ReminderDataItem(title, description, location, latLng?.latitude, latLng?.longitude)
+                ReminderDataItem(
+                    title,
+                    description,
+                    location,
+                    latLng?.latitude,
+                    latLng?.longitude,
+                    requestCode = viewModel.requestCode
+                )
             checkPermissionsAndStartGeofencing()
         }
     }
@@ -223,7 +226,7 @@ class SaveReminderFragment : BaseFragment() {
                     item.longitude ?: 0.0,
                     GEOFENCE_RADIUS_IN_METERS
                 )
-                .setExpirationDuration(TimeUnit.HOURS.toMillis(1))
+                .setExpirationDuration(NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .build()
 
@@ -232,18 +235,26 @@ class SaveReminderFragment : BaseFragment() {
                 .addGeofence(geofence)
                 .build()
 
-            geofencingClient.removeGeofences(geofencePendingIntent)?.run {
-                addOnCompleteListener {
-                    geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
-                        addOnSuccessListener {
-                            viewModel.saveReminder(item)
-                        }
-                        addOnFailureListener {
-                            viewModel.showToast.value = getString(R.string.geofences_not_added)
-                        }
-                    }
+            val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
+            intent.action = ACTION_GEOFENCE_EVENT
+            val geofencePendingIntent: PendingIntent = PendingIntent.getBroadcast(
+                context,
+                viewModel.requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            //geofencingClient.removeGeofences(geofencePendingIntent)?.run {
+            //    addOnCompleteListener {
+            geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
+                addOnSuccessListener {
+                    viewModel.validateAndSaveReminder(item)
+                }
+                addOnFailureListener {
+                    viewModel.showToast.value = getString(R.string.geofences_not_added)
                 }
             }
+            //  }
+            //}
         }
     }
 

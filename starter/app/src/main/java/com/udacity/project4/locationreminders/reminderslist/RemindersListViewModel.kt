@@ -37,7 +37,8 @@ class RemindersListViewModel(
                             reminder.location,
                             reminder.latitude,
                             reminder.longitude,
-                            reminder.id
+                            reminder.id,
+                            reminder.requestCode
                         )
                     })
                     remindersList.value = dataList

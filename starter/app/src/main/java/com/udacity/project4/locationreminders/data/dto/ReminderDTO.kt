@@ -23,5 +23,6 @@ data class ReminderDTO(
     @ColumnInfo(name = "location") var location: String?,
     @ColumnInfo(name = "latitude") var latitude: Double?,
     @ColumnInfo(name = "longitude") var longitude: Double?,
-    @PrimaryKey @ColumnInfo(name = "entry_id") val id: String = UUID.randomUUID().toString()
+    @PrimaryKey @ColumnInfo(name = "entry_id") val id: String = UUID.randomUUID().toString(),
+    @ColumnInfo(name = "requestCode") var requestCode: Int?
 )

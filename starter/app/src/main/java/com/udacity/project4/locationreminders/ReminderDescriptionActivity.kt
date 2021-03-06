@@ -1,14 +1,26 @@
 package com.udacity.project4.locationreminders
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.google.gson.Gson
+import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.location.LocationServices
 import com.udacity.project4.R
 import com.udacity.project4.databinding.ActivityReminderDescriptionBinding
+import com.udacity.project4.locationreminders.data.ReminderDataSource
+import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+import com.udacity.project4.locationreminders.savereminder.SaveReminderFragment
+import kotlinx.coroutines.*
+import org.koin.android.ext.android.inject
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Activity that displays the reminder details after the user clicks on the notification
@@ -26,6 +38,16 @@ class ReminderDescriptionActivity : AppCompatActivity() {
         }
     }
 
+    private var coroutineJob: Job = Job()
+    val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + coroutineJob
+
+    private val repository: ReminderDataSource by inject()
+
+    private lateinit var geofencingClient: GeofencingClient
+
+    private lateinit var item: ReminderDataItem
+
     private lateinit var binding: ActivityReminderDescriptionBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,8 +55,44 @@ class ReminderDescriptionActivity : AppCompatActivity() {
             this,
             R.layout.activity_reminder_description
         )
-        val item = intent.extras?.getSerializable(EXTRA_ReminderDataItem) as ReminderDataItem
+        item = intent.extras?.getSerializable(EXTRA_ReminderDataItem) as ReminderDataItem
+
+        geofencingClient = LocationServices.getGeofencingClient(this)
 
         binding.reminderDataItem = item
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.description_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.delete) delete()
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun delete() {
+        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        intent.action = SaveReminderFragment.ACTION_GEOFENCE_EVENT
+        val geofencePendingIntent: PendingIntent = PendingIntent.getBroadcast(
+            this,
+            item.requestCode ?: 0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        geofencingClient.removeGeofences(geofencePendingIntent)?.run {
+            addOnCompleteListener {
+                CoroutineScope(coroutineContext).launch {
+                    repository.deleteReminders(item.id)
+                }
+                val reminderIntent = Intent(baseContext, RemindersActivity::class.java)
+                reminderIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(reminderIntent)
+            }
+            addOnFailureListener {
+                Toast.makeText(baseContext, "Couldn't delete reminder", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 }

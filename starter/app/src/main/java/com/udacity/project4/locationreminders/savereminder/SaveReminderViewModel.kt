@@ -10,6 +10,7 @@ import com.udacity.project4.base.BaseViewModel
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
+import com.udacity.project4.locationreminders.data.dto.Result
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import kotlinx.coroutines.launch
 
@@ -20,6 +21,20 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
     val reminderSelectedLocationStr = MutableLiveData<String>()
     val selectedPOI = MutableLiveData<PointOfInterest>()
     val latLng = MutableLiveData<LatLng>()
+
+    var requestCode: Int = 0
+
+    fun fetchRequestCode() {
+        viewModelScope.launch {
+            val result = dataSource.getLastRequestCode()
+            requestCode = when (result) {
+                is Result.Success -> {
+                    result.data + 1
+                }
+                else -> 0
+            }
+        }
+    }
 
     /**
      * Clear the live data objects to start fresh next time the view model gets called
@@ -44,7 +59,7 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
     /**
      * Save the reminder to the data source
      */
-    fun saveReminder(reminderData: ReminderDataItem) {
+    private fun saveReminder(reminderData: ReminderDataItem) {
         showLoading.value = true
         viewModelScope.launch {
             dataSource.saveReminder(
@@ -54,7 +69,8 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
                     reminderData.location,
                     reminderData.latitude,
                     reminderData.longitude,
-                    reminderData.id
+                    reminderData.id,
+                    reminderData.requestCode
                 )
             )
             showLoading.value = false
@@ -66,7 +82,7 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
     /**
      * Validate the entered data and show error to the user if there's any invalid data
      */
-    fun validateEnteredData(reminderData: ReminderDataItem): Boolean {
+    private fun validateEnteredData(reminderData: ReminderDataItem): Boolean {
         if (reminderData.title.isNullOrEmpty()) {
             showSnackBarInt.value = R.string.err_enter_title
             return false
