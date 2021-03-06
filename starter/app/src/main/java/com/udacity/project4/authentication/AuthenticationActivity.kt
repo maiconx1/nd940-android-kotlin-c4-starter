@@ -52,7 +52,7 @@ class AuthenticationActivity : AppCompatActivity() {
         )
 
         loginResult.launch(
-            AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers)
+            AuthUI.getInstance().createSignInIntentBuilder().setLogo(R.drawable.map).setAvailableProviders(providers)
                 .build()
         )
     }

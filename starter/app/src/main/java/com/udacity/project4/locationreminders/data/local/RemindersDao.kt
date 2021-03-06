@@ -46,7 +46,7 @@ interface RemindersDao {
     suspend fun deleteReminders(id: List<String>)
 
     /**
-     * Delete reminders by id.
+     * Get last requestCode.
      */
     @Query("SELECT requestCode FROM reminders ORDER BY requestCode DESC LIMIT 1")
     suspend fun getLastRequestCode(): Int

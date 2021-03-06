@@ -2,6 +2,7 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context.LOCATION_SERVICE
 import android.content.DialogInterface
 import android.content.pm.PackageManager
@@ -24,14 +25,15 @@ import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.Message
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
+import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
-    companion object {
-        const val REQUEST_LOCATION_PERMISSION = 1
+    val reminderActivity: RemindersActivity by lazy {
+        activity as RemindersActivity
     }
 
     //Use Koin to get the view model of the SaveReminder
@@ -79,6 +81,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             onBackPressed()
         }
 
+        binding.selectBtn.setOnClickListener {
+            onLocationSelected()
+        }
+
         return binding.root
     }
 
@@ -123,12 +129,12 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         val zoomLevel = 10f
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel))
 
-        setMapLongClick(map)
+        setMapClick(map)
         setMapPoiClick(map)
         setInfoWindowClick(map)
     }
 
-    private fun setMapLongClick(map: GoogleMap) {
+    private fun setMapClick(map: GoogleMap) {
         map.setOnMapClickListener { latLng ->
             map.clear()
             val snippet = getString(R.string.lat_long_snippet, latLng.latitude, latLng.longitude)
@@ -193,11 +199,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             } catch (_: Exception) {
             }
         } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION_PERMISSION
-            )
+            reminderActivity.permissionCallback = { enableMyLocation() }
+            reminderActivity.requestPermission()
         }
     }
 
@@ -206,17 +209,5 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         viewModel.latLng.value = null
         viewModel.showToast.value = getString(R.string.select_cancelled)
         viewModel.navigationCommand.value = NavigationCommand.Back
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                enableMyLocation()
-            }
-        }
     }
 }

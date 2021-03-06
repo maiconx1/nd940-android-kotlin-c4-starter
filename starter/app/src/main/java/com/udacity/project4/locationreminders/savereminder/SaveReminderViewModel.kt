@@ -1,8 +1,7 @@
 package com.udacity.project4.locationreminders.savereminder
 
 import android.app.Application
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PointOfInterest
 import com.udacity.project4.R
@@ -22,6 +21,10 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
     val selectedPOI = MutableLiveData<PointOfInterest>()
     val latLng = MutableLiveData<LatLng>()
 
+    val saveButtonEnabled: LiveData<Boolean> = Transformations.map(latLng) {
+        it != null
+    }
+
     var requestCode: Int = 0
 
     fun fetchRequestCode() {
@@ -31,7 +34,7 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
                 is Result.Success -> {
                     result.data + 1
                 }
-                else -> 0
+                else -> 1
             }
         }
     }
