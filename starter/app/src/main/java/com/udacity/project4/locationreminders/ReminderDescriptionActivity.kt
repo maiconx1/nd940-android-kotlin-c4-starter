@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.google.gson.Gson
 import com.udacity.project4.R
 import com.udacity.project4.databinding.ActivityReminderDescriptionBinding
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
@@ -32,6 +33,8 @@ class ReminderDescriptionActivity : AppCompatActivity() {
             this,
             R.layout.activity_reminder_description
         )
-//        TODO: Add the implementation of the reminder details
+        val item = intent.extras?.getSerializable(EXTRA_ReminderDataItem) as ReminderDataItem
+
+        binding.reminderDataItem = item
     }
 }
