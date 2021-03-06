@@ -66,17 +66,14 @@ class SaveReminderFragment : BaseFragment() {
 
         viewModel.selectedPOI.observe(viewLifecycleOwner, Observer { poi ->
             viewModel.reminderSelectedLocationStr.value = poi?.let {
-                getString(R.string.chosen_location, poi.name)
+                poi.name
             } ?: ""
         })
 
         viewModel.latLng.observe(viewLifecycleOwner, Observer { latLng ->
             if (viewModel.selectedPOI.value == null) {
                 viewModel.reminderSelectedLocationStr.value = latLng?.let {
-                    getString(
-                        R.string.chosen_location,
-                        getString(R.string.lat_long_snippet, latLng.latitude, latLng.longitude)
-                    )
+                    getString(R.string.lat_long_snippet, latLng.latitude, latLng.longitude)
                 } ?: ""
             }
         })
@@ -104,10 +101,6 @@ class SaveReminderFragment : BaseFragment() {
             dataItem =
                 ReminderDataItem(title, description, location, latLng?.latitude, latLng?.longitude)
             checkPermissionsAndStartGeofencing()
-
-//            TODO: use the user entered reminder details to:
-//             1) add a geofencing request
-//             2) save the reminder to the local db
         }
     }
 

@@ -47,5 +47,4 @@
     <string name="choose_location_text">Choose %s?</string>
     <string name="choose_button">Choose</string>
     <string name="cancel_button">Cancel</string>
-    <string name="chosen_location">Chosen location: %s</string>
 </resources>
