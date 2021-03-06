@@ -14,7 +14,7 @@ import com.udacity.project4.locationreminders.data.dto.Result
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.not
 import org.hamcrest.Matchers.nullValue
@@ -51,7 +51,7 @@ class SaveReminderViewModelTest : BaseTest {
     fun fetchRequestCode_successHasData() {
         val fakeDataSource = dataSource as FakeDataSource
         assertThat(viewModel.requestCode, `is`(0))
-        mainCoroutineRule.launch {
+        runBlockingTest {
             fakeDataSource.saveReminder(FakeDataSource.MOCK_REMINDER_DTO)
         }
         viewModel.fetchRequestCode()
@@ -88,7 +88,7 @@ class SaveReminderViewModelTest : BaseTest {
     fun validateAndSaveReminder_dataNotValid() {
         val data = ReminderDataItem("", "", "", 0.0, 0.0)
         var remindersBefore: List<ReminderDTO>? = null
-        mainCoroutineRule.launch {
+        runBlockingTest {
             val reminders = dataSource.getReminders()
             if (reminders is Result.Success) {
                 remindersBefore = reminders.data
@@ -96,7 +96,7 @@ class SaveReminderViewModelTest : BaseTest {
         }
         assertThat(remindersBefore?.isEmpty(), `is`(true))
         viewModel.validateAndSaveReminder(data)
-        mainCoroutineRule.launch {
+        runBlockingTest {
             val reminders = dataSource.getReminders()
             if (reminders is Result.Success) {
                 remindersBefore = reminders.data
@@ -109,7 +109,7 @@ class SaveReminderViewModelTest : BaseTest {
     fun validateAndSaveReminder_validData() {
         val data = FakeDataSource.MOCK_REMINDER
         var remindersBefore: List<ReminderDTO>? = null
-        mainCoroutineRule.launch {
+        runBlockingTest {
             val reminders = dataSource.getReminders()
             if (reminders is Result.Success) {
                 remindersBefore = reminders.data
@@ -117,7 +117,7 @@ class SaveReminderViewModelTest : BaseTest {
         }
         assertThat(remindersBefore?.isEmpty(), `is`(true))
         viewModel.validateAndSaveReminder(data)
-        mainCoroutineRule.launch {
+        runBlockingTest {
             val reminders = dataSource.getReminders()
             if (reminders is Result.Success) {
                 remindersBefore = reminders.data
@@ -138,8 +138,8 @@ class SaveReminderViewModelTest : BaseTest {
         assertThat(viewModel.showToast.value, `is`(nullValue()))
         assertThat(viewModel.navigationCommand.value, `is`(nullValue()))
         mainCoroutineRule.resumeDispatcher()
-        assertThat(viewModel.showToast.value, `is`(not(nullValue())))
-        assertThat(viewModel.navigationCommand.value, `is`(not(nullValue())))
+        assertThat(viewModel.showToast.value, `is`(notNullValue()))
+        assertThat(viewModel.navigationCommand.value, `is`(notNullValue()))
         assertThat(viewModel.showLoading.value, `is`(false))
 
     }

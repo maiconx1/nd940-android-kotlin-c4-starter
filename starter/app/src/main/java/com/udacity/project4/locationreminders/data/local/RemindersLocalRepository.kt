@@ -69,15 +69,15 @@ class RemindersLocalRepository(
     /**
      * Deletes the reminders by id in the db
      */
-    override suspend fun deleteReminders(vararg id: String) {
+    override suspend fun deleteReminders(id: String) {
         withContext(ioDispatcher) {
-            remindersDao.deleteReminders(id.toList())
+            remindersDao.deleteReminders(listOf(id))
         }
     }
 
     override suspend fun getLastRequestCode(): Result<Int> = withContext(ioDispatcher) {
         return@withContext try {
-            Result.Success(remindersDao.getLastRequestCode())
+            Result.Success(remindersDao.getLastRequestCode() ?: 0)
         } catch (ex: Exception) {
             Result.Error(ex.localizedMessage)
         }

@@ -28,9 +28,6 @@ class AuthenticationActivity : AppCompatActivity() {
 
         if (signedIn) startReminders()
 
-//          TODO: a bonus is to customize the sign in flow to look nice using :
-        //https://github.com/firebase/FirebaseUI-Android/blob/master/auth/README.md#custom-layout
-
     }
 
     private val loginResult =

@@ -1,8 +1,11 @@
-package com.udacity.project4.locationreminders
+package com.udacity.project4
 
 import androidx.test.core.app.ApplicationProvider
-import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.ReminderDataSource
+import com.udacity.project4.locationreminders.data.local.FakeDao
+import com.udacity.project4.locationreminders.data.local.LocalDB
+import com.udacity.project4.locationreminders.data.local.RemindersDao
+import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import org.junit.After
@@ -12,6 +15,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 
@@ -36,7 +40,11 @@ interface BaseTest : KoinTest {
                     get() as ReminderDataSource
                 )
             }
-            single { FakeDataSource() as ReminderDataSource }
+            single { RemindersLocalRepository(get(named("fakeDao"))) as ReminderDataSource }
+            single(named("dao")) { LocalDB.createRemindersDao(androidContext()) }
+            single<RemindersDao>(named("fakeDao")) { FakeDao() }
+
+            single(override = true) { androidContext() }
         }
 
         startKoin {

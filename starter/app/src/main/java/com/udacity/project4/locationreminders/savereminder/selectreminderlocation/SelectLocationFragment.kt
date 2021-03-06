@@ -6,10 +6,12 @@ import android.annotation.SuppressLint
 import android.content.Context.LOCATION_SERVICE
 import android.content.DialogInterface
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.activity.addCallback
 import androidx.core.app.ActivityCompat
@@ -73,8 +75,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             childFragmentManager.findFragmentById(R.id.location_map) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
-//        TODO: add style to the map
-
         locationManager = requireActivity().getSystemService(LOCATION_SERVICE) as LocationManager
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -132,6 +132,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         setMapClick(map)
         setMapPoiClick(map)
         setInfoWindowClick(map)
+        setMapStyle(map)
     }
 
     private fun setMapClick(map: GoogleMap) {
@@ -179,6 +180,12 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                     DialogInterface.OnClickListener { dialog, _ -> dialog.dismiss() })
             )
         }
+    }
+
+    private fun setMapStyle(map: GoogleMap) {
+        try {
+            map.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style))
+        } catch (_: Resources.NotFoundException) {}
     }
 
     private fun enableMyLocation() {

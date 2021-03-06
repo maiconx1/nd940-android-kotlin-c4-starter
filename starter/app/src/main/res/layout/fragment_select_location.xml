@@ -27,7 +27,6 @@
 
         <Button
             android:id="@+id/select_btn"
-            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/colorAccent"

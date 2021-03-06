@@ -38,9 +38,15 @@ class FakeDataSource : ReminderDataSource {
         }
     }
 
-    override suspend fun deleteAllReminders() {}
+    override suspend fun deleteAllReminders() {
+        reminderList.clear()
+    }
 
-    override suspend fun deleteReminders(vararg id: String) {}
+    override suspend fun deleteReminders(vararg id: String) {
+        reminderList.removeIf { reminder ->
+            id.contains(reminder.id)
+        }
+    }
 
     override suspend fun getLastRequestCode(): Result<Int> {
         return if (!shouldReturnError) {

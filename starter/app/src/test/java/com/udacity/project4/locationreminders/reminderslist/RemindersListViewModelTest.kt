@@ -9,7 +9,7 @@ import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.hamcrest.core.Is.`is`
@@ -20,7 +20,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.component.inject
 import org.robolectric.annotation.Config
-import java.lang.Thread.sleep
 
 @RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
@@ -39,24 +38,25 @@ class RemindersListViewModelTest : BaseTest {
 
     @Test
     fun loadReminders_loading() {
-        mainCoroutineRule.pauseDispatcher()
-        remindersViewModel.loadReminders()
-        assertThat(remindersViewModel.showLoading.getOrAwaitValue(), `is`(true))
-        mainCoroutineRule.resumeDispatcher()
-        sleep(1000)
-        assertThat(remindersViewModel.showLoading.getOrAwaitValue(), `is`(false))
+        runBlockingTest {
+            mainCoroutineRule.pauseDispatcher()
+            remindersViewModel.loadReminders()
+            assertThat(remindersViewModel.showLoading.getOrAwaitValue(), `is`(true))
+            mainCoroutineRule.resumeDispatcher()
+            assertThat(remindersViewModel.showLoading.getOrAwaitValue(), `is`(false))
+        }
     }
 
     @Test
     fun loadReminders_successList() {
         assertThat(remindersViewModel.remindersList.value, `is`(nullValue()))
         remindersViewModel.loadReminders()
-        assertThat(remindersViewModel.remindersList.value, `is`(not(nullValue())))
+        assertThat(remindersViewModel.remindersList.value, `is`(notNullValue()))
     }
 
     @Test
     fun loadReminders_successValues() {
-        mainCoroutineRule.launch {
+        runBlockingTest {
             dataSource.saveReminder(FakeDataSource.MOCK_REMINDER_DTO)
         }
         assertThat(remindersViewModel.remindersList.value, `is`(nullValue()))
@@ -95,7 +95,7 @@ class RemindersListViewModelTest : BaseTest {
 
     @Test
     fun invalidateShowNoData_hasData() {
-        mainCoroutineRule.launch {
+        runBlockingTest {
             dataSource.saveReminder(FakeDataSource.MOCK_REMINDER_DTO)
         }
         remindersViewModel.loadReminders()

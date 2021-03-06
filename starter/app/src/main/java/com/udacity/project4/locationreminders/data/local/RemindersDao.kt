@@ -49,6 +49,6 @@ interface RemindersDao {
      * Get last requestCode.
      */
     @Query("SELECT requestCode FROM reminders ORDER BY requestCode DESC LIMIT 1")
-    suspend fun getLastRequestCode(): Int
+    suspend fun getLastRequestCode(): Int?
 
 }
