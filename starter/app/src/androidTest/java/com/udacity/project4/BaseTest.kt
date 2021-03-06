@@ -43,8 +43,6 @@ interface BaseTest : KoinTest {
             single { RemindersLocalRepository(get(named("fakeDao"))) as ReminderDataSource }
             single(named("dao")) { LocalDB.createRemindersDao(androidContext()) }
             single<RemindersDao>(named("fakeDao")) { FakeDao() }
-
-            single(override = true) { androidContext() }
         }
 
         startKoin {
